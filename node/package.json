@@ -22,6 +22,7 @@
     "node-uuid": "^1.4.7",
     "passport": "^0.3.2",
     "passport-local":"^1.0.0",
-    "request":"^2.79.0"
+    "request":"^2.79.0",
+    "shortid":"^2.2.8"
   }
 }

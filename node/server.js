@@ -34,7 +34,9 @@ var crypto = require('crypto');
 var passport = require('passport');
 var request = require('request');
 var compression = require('compression');
+var shortid = require('shortid');
 
+require('./models/Document');
 require('./models/User');
 require('./config/passport');
 var jwt = require('express-jwt');
@@ -59,6 +61,61 @@ app.use('/view', express.static( path.join(__dirname, 'static/view')));
 
 app.use(passport.initialize());
 app.use(bodyparser.json());
+
+// make it easy to process url path params by name
+app.param('shortid', function(req, res, next, _shortid) {
+
+  if (!shortid.isValid(_shortid)) {
+    return res.status(404).send('invalid id');
+  }
+
+  var query = Document.findOne({shortid:_shortid});
+  req.shortid = _shortid;
+
+  query.exec(function(err, _document) {
+    if (err) {
+      return next(err);
+    }
+
+    if (!_document) {
+      return next(new Error('could not find document'));
+    }
+
+    req.document = _document;
+    return next();
+  });
+});
+
+app.get('/api/document/:shortid', function(req, res, next) {
+  // if we didn't find a station for this stationid, create one right now
+  if (req.document == null) {
+    return res.status(401).json({message: 'document not found'});
+  }
+
+  return res.json(req.document);
+});
+
+app.post('/api/document', function(req, res, next) {
+  var object_type = typeof(req.body.document);
+  if (object_type != 'object') {
+    return res.status(400).json({message: 'you must specify an object/array for \'document\''});
+  }
+
+  var document = new Document();
+  document.data = req.body.document;
+  document.timestamp = Date.now();
+  document.ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+  document.shortid = shortid.generate();
+  document.public = true;
+  document.owner = '';
+
+  document.save(function(err, new_doc) {
+    if (err) {
+      return next(err);
+    }
+    return res.status(200).json(new_doc);
+  });
+});
 
 app.post('/api/login', function(req, res, next) {
   if (!req.body.username || !req.body.password) {

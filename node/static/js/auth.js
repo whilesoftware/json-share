@@ -44,7 +44,7 @@ rapid_frontend_client.factory(
     function($window) {
       var auth = {};
 
-      var TOKEN_NAME = 'rapid-auth-token';
+      var TOKEN_NAME = 'json-share-auth-token';
 
       auth.saveToken = function(token) {
         $window.localStorage[TOKEN_NAME] = token;

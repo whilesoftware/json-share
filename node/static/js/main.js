@@ -1,6 +1,6 @@
 rapid_frontend_client = angular.module('rapid.frontend.client', ['ui.router']);
 
-rapid_frontend_client.constant('API', 'https://while.software/template/api/');
+rapid_frontend_client.constant('API', 'https://while.software/json/api/');
 
 rapid_frontend_client.config([
   '$stateProvider',
