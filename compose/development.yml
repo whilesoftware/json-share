@@ -7,7 +7,7 @@ services:
       - web1
       - web2
     ports:
-      - "3333:80"
+      - "31339:80"
   web1:
     restart: always
     build: ./node

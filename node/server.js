@@ -49,6 +49,7 @@ var auth = jwt({secret: SUPERSECRETKEY, userProperty: 'payload'});
 
 var db = mongoose.connection;
 var User = mongoose.model('User');
+var Document = mongoose.model('Document');
 
 const PORT = 8080;
 const app = express();
@@ -93,6 +94,30 @@ app.get('/api/document/:shortid', function(req, res, next) {
   }
 
   return res.json(req.document);
+});
+
+app.put('/api/document/:shortid', function(req, res, next) {
+  // verify that we found a document with this shortid
+  if (req.document == null) {
+    return res.status(404).send('document not found');
+  }
+
+  // verify that the PUT request has a valid body
+  var object_type = typeof(req.body.document);
+  if (object_type != 'object') {
+    return res.status(405).send('you must specify an object/array for \'document\'');
+  }
+
+  // edit the document
+  req.document.data = req.body.document;
+
+  // save the document
+  req.document.save(function(err, new_doc) {
+    if (err) {
+      return next(err);
+    }
+    return res.status(200).json(new_doc);
+  });
 });
 
 app.post('/api/document', function(req, res, next) {

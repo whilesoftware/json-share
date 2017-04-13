@@ -19,6 +19,11 @@ rapid_frontend_client.config([
         templateUrl: 'view/404.html',
         controller: 'notFoundController'
       })
+      .state('document', {
+        url: '/{shortid}',
+        templateUrl: 'view/document.html',
+        controller: 'documentController'
+      })
       .state('home', {
         url: '/',
         templateUrl: 'view/home.html',
